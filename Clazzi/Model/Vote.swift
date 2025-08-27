@@ -13,4 +13,3 @@ struct Vote: Identifiable{
 
 }
 
-import Foundation
