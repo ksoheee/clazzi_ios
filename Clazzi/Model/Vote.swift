@@ -26,8 +26,18 @@ class Vote :Identifiable{
 @Model
 class VoteOption {
     var name: String
+    var voters: [UUID] = [] //여기에 투표자 ID 저장
     
     init(name: String){
         self.name = name
+    }
+    //해당 투표 항목에 투표자가 몇 명 있는지: 투표수
+    var votes: Int{
+        voters.count
+    }
+    
+    //로그인한 유저가 이미 투표했는지, 투표 했다면 투표 못하도록 
+    func hasVoted(userId: UUID) -> Bool{
+        voters.contains(userId)
     }
 }

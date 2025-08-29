@@ -12,7 +12,8 @@ struct VoteListView: View {
     @Environment(\.modelContext) private var modelContext
     //let votes = ["첫 번째 투표", "두 번째 투표", "세 번째 투표","4","5","6","7","8"]
     
-    @Binding var isLoggedIn: Bool
+    //@Binding var isLoggedIn: Bool
+    @Binding var currentUserID: UUID?
     
     //스위프트 데이터에서 가져오기
     @Query(sort: \Vote.title, order: .forward) private var votes: [Vote]
@@ -57,7 +58,7 @@ struct VoteListView: View {
                     LazyVStack(spacing: 16) {
                         ForEach(votes/*.indices, id: \.self*/) { vote in //votes의 인덱스를 가져오기 위해 indices
 //                            let vote = votes[index]
-                            NavigationLink(destination: VoteView(vote:vote)){
+                            NavigationLink(destination: VoteView(vote:vote, currentUserID: $currentUserID)){
                                 VoteCardView(vote: vote) {
                                     voteToDelete = vote
                                     showDeleteAlert = true
@@ -105,7 +106,7 @@ struct VoteListView: View {
 //                    }
                 }
                 ToolbarItem(placement: .navigationBarTrailing){
-                    NavigationLink(destination: MyPageView(isLoggedIn: $isLoggedIn)){
+                    NavigationLink(destination: MyPageView(currentUserID: $currentUserID)){
                         Image(systemName: "person")
                     }
                    
@@ -219,6 +220,45 @@ struct VoteCardView: View {
     }
 }
 
+struct VoteListView_PreViews: PreviewProvider {
+    struct Wrapper: View{
+        
+        @State var currentUserID: UUID? = UUID(uuidString:"가짜 UUID")
+        @State var isLoggedIn: Bool = false
+        let a: Int = {
+            10 + 1
+        }()
+        
+        let container: ModelContainer = {
+            let schema = Schema([Vote.self, VoteOption.self])
+            let config = ModelConfiguration(isStoredInMemoryOnly: true)
+            let container = try! ModelContainer(for: schema, configurations: [config])
+            
+            //더미 데이터
+            let context = container.mainContext
+            //샘플데이터 추가
+            let sampleVote1 = Vote(title: "샘플 투표 1", options: [
+                VoteOption(name: "옵션 1"),
+                VoteOption(name: "옵션 2")
+            ])
+            let sampleVote2 = Vote(title: "샘플 투표 2", options: [
+                VoteOption(name: "옵션 A"),
+                VoteOption(name: "옵션 B")
+            ])
+            context.insert(sampleVote1)
+            context.insert(sampleVote2)
+            return container
+        }()
+        var body: some View{
+            VoteListView(currentUserID: $currentUserID)
+                .modelContainer(container)
+        }
+    }
+    static var previews: some View{
+        Wrapper()
+    }
+}
+
 /*#Preview {
     do {
         // 인메모리 ModelContainer 생성
@@ -248,3 +288,5 @@ struct VoteCardView: View {
         fatalError("프리뷰용 ModelContainer 초기화 실패: (error.localizedDescription)")
     }
 }*/
+
+

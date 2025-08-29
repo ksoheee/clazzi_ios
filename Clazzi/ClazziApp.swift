@@ -11,7 +11,13 @@ import SwiftData
 @main
 struct ClazziApp: App {
     //로그인 상태
-    @State var isLoggedIn: Bool = false
+//    @State var isLoggedIn:Bool = UserDefaults.standard.bool(forKey: "isLoggedIn")
+    @State var currentUserID : UUID? = {
+        if let idString = UserDefaults.standard.string(forKey: "currentUserID"), let id = UUID(uuidString: idString){
+            return id
+        }
+        return nil //로그인 아무도 안되어 있다
+    }()//즉시 실행 연산자 
     
     //스위프트 데이터 컨테이너
     var sharedModelcontainer: ModelContainer = {
@@ -29,11 +35,17 @@ struct ClazziApp: App {
     }()
     var body: some Scene {
         WindowGroup {
-            if isLoggedIn{
-                VoteListView(isLoggedIn: $isLoggedIn)
+            if currentUserID == nil {
+                AuthView(currentUserID: $currentUserID)
             }else{
-                AuthView(isLoggedIn: $isLoggedIn)
+                VoteListView(currentUserID: $currentUserID)
             }
+            
+//            if isLoggedIn{
+//                VoteListView(isLoggedIn: $isLoggedIn)
+//            }else{
+//                AuthView(isLoggedIn: $isLoggedIn)
+//            }
         }
         .modelContainer(sharedModelcontainer)
     }

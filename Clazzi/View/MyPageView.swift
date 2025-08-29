@@ -8,14 +8,18 @@
 import SwiftUI
 
 struct MyPageView: View {
-    @Binding var isLoggedIn : Bool
+    //@Binding var isLoggedIn : Bool
+    @Binding var currentUserID : UUID?
     var body: some View {
         NavigationStack{
             VStack{
                 Text("로그인 된 이메일:")
                 Text("가짜 이메일")
                 Button(action:{
-                    isLoggedIn = false
+                    currentUserID = nil
+                    //isLoggedIn = false
+                    //UserDefaults.standard.set(false, forKey: "isLoggedIn")
+                    UserDefaults.standard.removeObject(forKey: "currentUserID")
                 }){
                     Text("로그아웃")
                         .frame(maxWidth: .infinity)
@@ -30,6 +34,20 @@ struct MyPageView: View {
         }
     }
 }
+
+struct MyPageView_PreViews: PreviewProvider {
+    struct Wrapper: View{
+        //@State var isLoggedIn: Bool = false
+        @State var currentUserID: UUID? = nil
+        var body: some View{
+            MyPageView(currentUserID: $currentUserID)
+        }
+    }
+    static var previews: some View{
+        Wrapper()
+    }
+}
+
 
 //#Preview {
 //    MyPageView()
