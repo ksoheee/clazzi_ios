@@ -167,22 +167,7 @@ struct AuthView: View {
 
 
 
-//struct AuthView_PreViews: PreviewProvider {
-//    struct Wrapper: View{
-//        //@State var isLoggedIn: Bool = false
-//        @State var isLoggedIn: Bool = false
-//        var body: some View{
-//            AuthView(isLoggedIn: $isLoggedIn)
-//        }
-//    }
-//    static var previews: some View{
-//        Wrapper()
-//    }
-//}
-
-
 #Preview {
-    //@Previewable @State var isLoggenIn: Bool = false
     @Previewable @State var currentUserID: UUID? = nil
     AuthView(currentUserID: $currentUserID)
 }

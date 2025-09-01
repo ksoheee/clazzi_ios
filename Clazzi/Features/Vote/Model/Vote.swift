@@ -16,7 +16,7 @@ class Vote :Identifiable{
     @Relationship(deleteRule: .cascade)
     var options: [VoteOption]
     
-    init(title:String, options:[VoteOption]){
+    init(title:String,options: [VoteOption] = []){
         self.id = UUID()
         self.title = title
         self.options = options

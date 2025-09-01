@@ -6,27 +6,46 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct MyPageView: View {
-    //@Binding var isLoggedIn : Bool
+    @Environment(\.modelContext) private var modelContext
     @Binding var currentUserID : UUID?
+    @Query private var users: [User]
+    
     var body: some View {
         NavigationStack{
-            VStack{
-                Text("로그인 된 이메일:")
-                Text("가짜 이메일")
-                Button(action:{
-                    currentUserID = nil
-                    //isLoggedIn = false
-                    //UserDefaults.standard.set(false, forKey: "isLoggedIn")
-                    UserDefaults.standard.removeObject(forKey: "currentUserID")
-                }){
-                    Text("로그아웃")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.red)
-                        .foregroundStyle(.white)
-                        .cornerRadius(8)
+            VStack(spacing: 32) {
+                if let user = users.first(where: { $0.id == currentUserID }) {
+                    Spacer()
+                    
+                    Text("로그인된 이메일:")
+                        .font(.headline)
+                    Text(user.email)
+                        .font(.title2)
+                        .foregroundColor(.blue)
+                        .multilineTextAlignment(.center)
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        // 로그아웃
+                        UserDefaults.standard.removeObject(forKey: "currentUserID")
+                        currentUserID = nil
+                    }) {
+                        Text("로그아웃")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.red)
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                    }
+                    .padding(.horizontal)
+                    
+                    Spacer()
+                } else {
+                    Text("로그인된 사용자가 없습니다.")
+                        .foregroundColor(.gray)
                 }
             }
             .padding()
@@ -35,20 +54,28 @@ struct MyPageView: View {
     }
 }
 
-struct MyPageView_PreViews: PreviewProvider {
-    struct Wrapper: View{
-        //@State var isLoggedIn: Bool = false
-        @State var currentUserID: UUID? = nil
-        var body: some View{
-            MyPageView(currentUserID: $currentUserID)
+
+
+#Preview {
+    // @Previewable은 맨 위에 와야 한다.
+    @Previewable @State var currentUserID: UUID? = nil
+    
+    // 1. 컨테이너 만들기
+    let container = try! ModelContainer(
+        for: User.self,
+        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+    )
+    
+    // 2. 가짜 사용자 추가
+    let context = container.mainContext
+    let fakeUser = User(email: "test@example.com", password: "1234")
+    context.insert(fakeUser)
+    
+    // 3. 뷰에 연결
+    return MyPageView(currentUserID: $currentUserID)
+        .modelContainer(container)
+        .onAppear {
+            // 4. MyPageView가 렌더링 된 후 ID를 프리뷰 상태에 세팅
+            currentUserID = fakeUser.id
         }
-    }
-    static var previews: some View{
-        Wrapper()
-    }
 }
-
-
-//#Preview {
-//    MyPageView()
-//}
