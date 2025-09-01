@@ -22,8 +22,12 @@ struct VoteView: View {
     
     //현재 유저가 이미 투표 했는지
     private var hasVoted: Bool{
-        vote.options.contains(where: {$0.voters.contains(currentUserID ?? UUID() )})
+        guard let userID = currentUserID else {return false}
+        return vote.options.contains(where: {$0.voters.contains(userID)})
     }
+    
+    //토스트 메세지
+    @State private var toastMessage: String? = nil
     
     var body: some View {
         NavigationStack{
